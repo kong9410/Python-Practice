@@ -1,6 +1,8 @@
 ## R연습  
 
-행과 열을 갖는 것 dataFrame
+행과 열을 갖는 것 dataFrame  
+화면 지우기 ctrl+l  
+범주형 Factor
 
 print("내용") 출력하는 함수
 
@@ -17,6 +19,7 @@ plot(x, y) 그래프를 그리는 함수
 sum(numbers) 합을 구하는 함수
 
 read.csv(csv file in workspace folder) csv파일을 읽어들이는 함수  
+read.csv(csv file in workspace folder, stringAsFactor = False) False로 두면 string을 factor가 아닌 chr형식으로 받는다.
 str(df) 불러들여온 파일의 변수나 행정보를 볼 수 있다  
 
 NA 아무것도 없는 상태를 말함
@@ -81,4 +84,33 @@ hflights[1,2] 1행 2열 값
 hflights[c(1,11)] 1행과 11행의 값들을 반환  
 hflights[c("Origin", "Dest")] 칼럼 번호 대신 칼럼명으로 쓸 수도 있음
 
-subset(hflights, select = c("Year", "Month")) 부분 집합 데이터 프레임 
+subset(hflights, select = c("Year", "Month")) 부분 집합 데이터 프레임  
+사실상 hflights[c("Year", "Month")]와 같음
+
+colnames(데이터프레임명) 데이터프레임의 칼럼 명을 반환  
+colnames(데이터프레임명)[인덱스] 칼럼프레임에서 ?번째 칼럼명 반환  
+colnames(데이터프레임명)[인덱스] <- "다른 칼럼명" 칼럼명 변환  
+colnames(데이터프레임명) <- c("칼럼1", "칼럼2" ...)  여러개의 칼럼명을 한꺼번에 변환
+
+데이터프레임명$칼럼명 + 숫자  데이터에 숫자만큼 전부 더해줌
+
+cbind(데이터프레임명, 추가데이터프레임) 데이터프레임에 추가로 칼럼과 데이터값을 붙여줌
+
+table(데이터프레임$칼럼명) 데이터프레임에 있는 특정 칼럼의 value의 횟수를 카운트해서 테이블로 만들어줌
+
+length(CountOfDest) 데이터프레임 vlaue 갯수세기 
+
+range(a) 범위 구하기
+
+example :: CountOfDest[CountOfDest == 1] CountOfDest 테이블에서 value가 1인 값을 찾기
+
+addmargins(table, margin) 각 칼럼에 대한 값들과 합을 보여줌
+
+barplot(table, main="title", xlab="x_name", ylab="y_name", col="#00ff00") 막대그래프로 보여줌 main은 제목 x, y 좌표 이름, col은 색상
+
+data("variable name") 데이터 가져오기
+
+plot(dataframe$x, dataframe$y, main="title", xlab="x_name", ylab="y_name", pch=20) 점 그래프 만들기, pch는 점 모양
+
+dfss[1] <- as.factor(dfss$schoolname) dfss[1]의 자료형을 factor로 변환
+
