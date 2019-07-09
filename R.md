@@ -1,5 +1,6 @@
 ## R연습  
 
+행과 열을 갖는 것 dataFrame
 
 print("내용") 출력하는 함수
 
@@ -59,3 +60,25 @@ df <- data.frame(num=d1, name=d2, avg=d3)
 데이터 프레임에 대한 변수이름을 바꾸고 싶을 때 사용한다.  
 바꿀 이름을 앞, 원래 변수명을 뒤에
 
+install.packages("패키지명")  패키지 설치  
+install.packages("hflights") hflights 패키지 설치
+
+library(패키지명) 패키지 임포트  
+library(hflights) hflights 패키지 임포트
+
+head(패키지명, 갯수) 원하는 자료를 갯수만큼 보여주라
+
+패키지or데이터프레임명$칼럼명 데이터프레임에서 특정 칼럼의 value값을 추출  
+hfligths$AirTime  
+head(hflights$AirTime, 10) 원하는 개수만 출력
+
+head(hflights[1]) 첫번째 칼럼 value를 추출
+
+class(hflights) hflights의 클래스 타입 출력  
+class(hflights[11]) hflights의 11번째의 클래스 타입 출력 => 1개의 데이터를 가진 dataFrame  
+class(hflights[[11]]) hflights의 11번째의 데이터 하나하나 타입 => 1개의 데이터 integer
+hflights[1,2] 1행 2열 값  
+hflights[c(1,11)] 1행과 11행의 값들을 반환  
+hflights[c("Origin", "Dest")] 칼럼 번호 대신 칼럼명으로 쓸 수도 있음
+
+subset(hflights, select = c("Year", "Month")) 부분 집합 데이터 프레임 
