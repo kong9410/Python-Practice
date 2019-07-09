@@ -116,7 +116,11 @@ plot(dataframe$x, dataframe$y, main="title", xlab="x_name", ylab="y_name", pch=2
 pch는 점 모양  
 cex는 점 그림 크기 배수  
 type은 그래프 형태, 'l'이면 라인, 'b'는 점과 선, 'o'는 오버랩 <help탭 확인>  
-lty는 1~6까지, 선의 형태 결정(실선, 점선 등)
+lty는 1~6까지, 선의 형태 결정(실선, 점선 등)  
+```R
+points(iris$Petal.Width, iris$petal.Length, pch="+", col="RED)
+#기존 plot에 points를 더 추가
+```
 
 dfss[1] <- as.factor(dfss$schoolname) dfss[1]의 자료형을 factor로 변환
 
@@ -168,6 +172,5 @@ f <- function(x){
     g(x)
 }
 ```
-
 
 
