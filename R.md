@@ -110,7 +110,64 @@ barplot(table, main="title", xlab="x_name", ylab="y_name", col="#00ff00") 막대
 
 data("variable name") 데이터 가져오기
 
-plot(dataframe$x, dataframe$y, main="title", xlab="x_name", ylab="y_name", pch=20) 점 그래프 만들기, pch는 점 모양
+#### 그래프
+
+plot(dataframe$x, dataframe$y, main="title", xlab="x_name", ylab="y_name", pch=20, cex=0.5, type="l", lty=1) 점 그래프 만들기  
+pch는 점 모양  
+cex는 점 그림 크기 배수  
+type은 그래프 형태, 'l'이면 라인, 'b'는 점과 선, 'o'는 오버랩 <help탭 확인>  
+lty는 1~6까지, 선의 형태 결정(실선, 점선 등)
 
 dfss[1] <- as.factor(dfss$schoolname) dfss[1]의 자료형을 factor로 변환
+
+df[,8] 모든 행의 8열을 나타냄
+
+subset(dfss, subset = something > 100) dfss에서 something 칼럼이 100개 초과인 데이터 프레임을 나타냄  
+subset(dfss, select = -something) dfss에서 something 칼럼을 제거  
+subset(dfss, select = c(-s1, -s2, ...) dfss에서 여러개 칼럼을 제거할 때
+
+tapply(vector, index, function) vector는 숫자형 데이터프레임, index는 분류기준, function은 sum이나 avg등 처리함수
+
+c(1:10) 1부터 10까지 자동생성
+
+list(a, b, c, d) 여러개의 데이터 프레임, 리스트, 함수 등을 묶어 하나의 리스트로 만듦
+
+as.character(some) character형으로 변환
+
+matrix(1:9, ncol=3) 열의 개수가 3개인 1부터 9까지 증가하는 행렬 만듦
+
+as.data.frame() 데이터 프레임 형태로 만든다
+
+if문, else문 c언어와 똑같이 중괄호와 같이 작성  
+ifelse(조건, "참", "거짓") 조건에 따라 두번째 혹은 세번째가 실행됨  
+for(i in 1:10){} 1부터 10까지 반복문  
+while(조건){} 똑같음
+
+next() C의 continue와 비슷함  
+break  C의 break와 같음
+
+example::
+```R
+sum(1:3, NA, na.rm = TRUE) 
+#1,2,3,na를 더할 때 na를 지움
+```
+
+na.rm = TRUE na를 다 제거  
+na.ommit(x) na를 생략
+na.pass(x) na를 패스
+
+###함수만들기
+myFunc <- function(a){} 일반적인 함수 만들기  
+```R
+f <- function(x){
+    a <- 1
+    #함수 속에 함수를 만들 수 있다.
+    g <- function(y){
+        print(y+a)
+    }
+    g(x)
+}
+```
+
+
 
