@@ -191,8 +191,10 @@ data("variable name")
 ```
 
 #### 그래프
-
-plot(dataframe$x, dataframe$y, main="title", xlab="x_name", ylab="y_name", pch=20, cex=0.5, type="l", lty=1) 점 그래프 만들기  
+점 그래프 만들기  
+```R
+plot(dataframe$x, dataframe$y, main="title", xlab="x_name", ylab="y_name", pch=20, cex=0.5, type="l", lty=1) 
+```
 pch는 점 모양  
 cex는 점 그림 크기 배수  
 type은 그래프 형태, 'l'이면 라인, 'b'는 점과 선, 'o'는 오버랩 <help탭 확인>  
