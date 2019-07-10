@@ -287,4 +287,152 @@ f <- function(x){
 }
 ```
 
+그래프 표에 주석달기  
+```R
+legend("topright", legend=c("Sepal", "Petal"), pch=c(20,43), col=c("blue", "red"), bg="gray")
+```
+
+히스토그램 (빈도수로 표현)  
+```R
+hist(iris$Sepal.Width)
+```  
+히스토그램 (밀도로 표현)  
+```R
+hist(iris#Sepal.Width, freq=FALSE)
+```
+
+라인 그래프  
+```R
+plot(destiny(iris$Sepal.Width))
+```
+
+그려져 있는 그래프에서 라인 그래프 추가  
+```R
+lines(density(iris$Sepal.Width))
+```
+
+### 상관관계
+
+```R
+aq2 <- na.omit(airqulity[,c(1:4)])	#airquality 데이터셋
+cor(aq2) # NA값이 있을시 계산 결과 NA
+```  
+결과값 : minus관계는 수치가 커지면 그 관계의 상대는 작아지는 것
+
+```R
+plot(aq2) # 상관관계 그래프
+pairs(aq2, panel = panel.smooth) # 기울기 그래프로 그려준다
+```
+
+### 분석 패키지
+
+##### PerformanceAnalytics 패키지
+
+```R
+install.packages("PerformanceAnalytics")
+library("PerformanceAnalytics")
+```
+
+자기자신에 대해서는 히스토그램, 다른 상관관계는 수치형식과 관계그래프로 보여줌
+```R
+chart.Correlation(aq2, histogram = TRUE, pch=19)
+```
+
+##### corrplot 패키지
+
+corr 패키지 설치  
+```R
+install.packages("corrplot")
+library("corrplot")
+```
+
+corrplot 도표 만들기
+```R
+aq.cor <- cor(aq2) # aq2에 대한 상관관계 데이터프레임 만들기
+corrplot(aq.cor, method="number") # 숫자로 상관관계 표만들기
+corrplot(aq.cor, method="square")
+corrplot(aq.cor, method="circle")
+corrplot(aq.cor, method="ellipse")
+corrplot(aq.cor, method="shade", addshade="all", t1.col="red", diag=FALSE, addCoef.col="black", arder="FPC")
+corrplot(aq.cor, method="pie")
+corrplot(aq.cor, method="color")
+```
+
+
+범위 지정 후 자르는 함수  
+```R
+# cancer$age는 40세, 70세 등의 나이정보를 가지고있다.
+doa <- table(cut(cancer$age, breaks = (1:9)*10))
+# ( : 포함이 안됨, [ : 포함됨
+```
+
+이름 바꾸기
+```R
+rownames(doa)<-c("10대", "20대", "30대", "40대", "50대", "60대", "70대", "80대")
+```
+
+##### GGTHEMES
+
+```R
+install.packages("ggthemes")
+library(ggplot2)
+library(ggthemes)
+```
+
+```R
+ggplot(data=cancer, aes(x=age))+geom_freqpoly(binwidth=20, size=3, colour="blue")+theme_bw()
+# binwidth는 좌우 폭, theme_bw()는 바깥 테두리
+```
+
+
+#### 데이터 읽기
+
+기존의 read.csv는 파일이 클 경우에는 시간이 오래걸림  
+그래서 data.table이라는 것을 사용
+
+```R
+install.packages("data.table")
+library("data.table")
+df <- fread("cafe_1.csv", header=TRUE, stringsAsFactors=TRUE) #타이틀이 있는 경우 header
+```
+
+
+인덱스 값 찾기  
+```R
+doy <- table(df$year)
+which(rownames(doy)=="2007")
+fr <- table(df$status, df$year)
+which(colnames(fr)=="2007")
+```
+
+비율 알기  
+```R
+prop.table(fr, margin=2) #margin 비교개수
+```
+
+데이터 프레임 만들기
+```R
+newdf <- data.frame(colnames(fr),fr[1,], fr[2,], pfr[1,], pfr[2,])
+```
+
+#### 문자 관련 패키지
+```R
+install.packages("stringr")
+library(stringr)
+```
+
+NA값 가지고 있는 행 지우기
+```R
+df1<-df1[complete.cases(df1), ]
+```
+
+##### 10,000 꼴의 문자 숫자로 변환하기
+```R
+# 3,4번째 항목이 바꿔야할 숫자일 때
+for(i in 3:4){
+    df1[,i]<-sapply(df1[,i], function(x) gsub(",", "", x))  # ","를 ""로 변환
+    df1[,i]<-as.numeric(df1[,i])   #문자열을 숫자로 변환
+}
+```
+
 
