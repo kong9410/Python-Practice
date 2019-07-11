@@ -436,3 +436,213 @@ for(i in 3:4){
 ```
 
 
+누적 그래프  
+```R
+ggplot(mtcars, aes(x=factor(cyl)))+geom_bar(aes(fill=factor(gear)))
+```
+
+박스 그래프
+```R
+ggplot(airquality, aes(x=Day, y=Temp, group=Day))+geom_boxplot()
+```
+
+히스토그램
+```R
+ggplot(airquality, aes(Temp))+geom_histogram()
+```
+
+기울기가 있는 그래프
+```R
+ggplot(economics, aes(x=date, y=psavert))+geom_line()+geom_abline(intercept = 12.18671, slope = -0.000544)
+#intercept는 절편, slope는 기울기
+ggplot(economics, aes(x=date, y=psavert))+geom_line()+geom_hline(yintercept = 12.18671, mean(economics$psavert))
+ggplot(economics, aes(x=date, y=psavert))+geom_line()+geom_vline(xintercept = 2010)
+```
+
+텍스트와 같이 있는 그래프
+```R
+ggplot(airquality, aes(x=Day, y=Temp))+geom_point()+geom_text(aes(label=Temp, vjust=0, hjust=0))
+```
+
+영역표시
+```R
+ggplot(mtcars, aes(x=wt, y=mpg))+geom_point()+annotate("rect", xmin = 3, ymin = 12, xmax = 4, ymax = 21, alpha = 0.5, fill = "skyblue")
+ggplot(mtcars, aes(x=wt, y=mpg))+geom_point()+annotate("rect", xmin = 3, ymin = 12, xmax = 4, ymax = 21, alpha = 0.5, fill = "skyblue")+annotate("segment", x = 2.5, xend = 3.7, y = 10, yend = 17, color = "red", arrow = arrow())
+```
+
+labs 함수
+```R
+ggplot(mtcars, aes(x = gear))+geom_bar()+labs(x = "기어 수", y = "자동차 수", title = "변속기 기어별 자동차수")
+```
+
+격자무늬 생성
+```R
+ggplot(mtcars, aes(x = gear))+geom_bar()+labs(x = "기어 수", y = "자동차 수", title = "변속기 기어별 자동차수")+theme_linedraw()
+```
+
+googleVis
+```R
+install.packages("googleVis")
+library(googleVis)
+```
+
+움직이는 차트 실행하기
+```R
+motion <- gvisMotionChart(ecnomics, idvar = "psavert", timevar = "date")
+plot(motion)
+```
+
+게이지 모션 차트
+```R
+gauge <- gvisGauge(CityPopularity, labelvar = "City", numvar = "Popularity", options = list(min = 0, max = 1000))
+plot(gauge)
+```
+
+다양한 형태의 그래프 사용  
+MASS 사용
+```R
+install.packages(MASS)
+library(MASS)
+x <- (1:10)
+y <- x^2/log(x+1)
+plot(x,y)
+M1 <- rnorm(200, 3, 1)
+M2 <- rnorm(200, 3, 10)
+bivn.kde <- kde2d(M1, M2, n=50)
+op <- par(mfrow = c(2,2))
+plot(x, y)
+contour(bivn.kde)
+image(bivn.kde)
+persp(bivn.kde, phi = 10, theta = 30, col = "gray")
+par(op)
+```
+
+#### 회귀 분석
+```R
+lm(mpg ~ hp, data = mtcars)
+# ~앞이 종속변수, ~뒤가 독립변수
+# Intercept는 절편, hp의 값이 기울기
+```
+
+자동차 속도와 제동거리 관계
+```R
+m<-lm(dist~speed, data=cars)
+#dist = -17.579 + 3.932 * speed
+abline(m)
+#예측
+pre <- predict(m, interval = "confidence")
+head(pre, 10)
+#lwr 하한치, upr 상한치
+predict(m, newdata = data.frame(speed=100))
+#speed가 100일때 제동거리 예측
+```
+
+dplyr패키지
+```R
+install.packages("dplyr")
+library(dplyr)
+```
+
+필터링
+```R
+filter(mtcars, cyl==4) #실린더가 4개인 자동차만 추출
+```
+
+정렬
+```R
+arrange(mtcars, mpg) #데이터와 정렬기준
+arrange(mtcars, desc(mpg))
+arrange(mtcars, mpg, desc(wt))
+```
+
+데이터프레임만들기
+```R
+dfss <- select(mtcars, mpg, cyl, hp, wt)
+```
+
+열 추가하기, 순위 매기기
+```R
+mutate(mtcars, mpg_rank = rank(mpg))
+```
+
+중복 제거하기
+```R
+distinct(mtcars, cyl)
+```
+
+요약하기
+```R
+summarise(mtcars, cyl_mean = mean(cyl), cyl_min = min(cyl), cyl_max(cyl))
+```
+
+##### mean(), median(), sd():표준편차, min(), max(), sum()
+
+그룹화하기
+```R
+gp_cyl <- group_by(mtcars, cyl)
+```
+
+단순 갯수 세기
+```R
+summarise(gr_cyl, n())
+# table함수와 비슷
+```
+
+중복 값을 빼고 갯수 세기
+```R
+summarise(gr_cyl, n_distinct(gear))
+```
+
+랜덤하게 값을 뽑는 함수
+```R
+sample_n(mtcars, 10)
+```
+
+전체 갯수에서 20%만 뽑기
+```R
+sample_frac(mtcars, 0.2)
+```
+
+#### 파이프 연산자  
+서로 연결하는 연산자
+```R
+%>%
+```
+
+example::  
+```R
+group_by(mtcars, cyl) %>% summarise(n())
+```
+
+다음과 같은 연산이 있다.
+```R
+mp_rank <- mutate(mtcars, mpg_rank=rank(mpg))
+arrange(mp_rank, mpg_rank)
+```
+이것을 파이프 연산자로 한꺼번에 처리할 수 있다.
+```R
+mp_rank <- mutate(mtcars, mpg_rank=rank(mpg)) %>% arrange(mp_rank, mpg_rank)
+```
+다음 방법으로 mtcars에 있는 mpg열을 뽑아낼 수 있다.
+```R
+mtcars %>% select(mpg)
+```
+
+
+#### melt 사용하기  
+패키지 설치
+```R
+install.packages("reshape2")
+library(reshape2)
+```
+
+melt사용해보기
+```R
+names(airquality) <- tolower(names(airquality, id.vars="ozone"))
+melt_test <- melt(airquality, id.vars="ozone")
+melt_test2 <- melt(airquality, id.vars = c("month", "wind", measure.vars = "ozone")
+```
+
+세로로 긴 데이터 모양을 가로로 전환하는 함수  
+cast()
+
