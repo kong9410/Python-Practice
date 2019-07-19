@@ -98,3 +98,29 @@ import tensorflow as tf
 
 g = tf.Graph()
 ```
+
+- RNN
+x에서 ht값으로 가는 과정
+x와 h가 멀어질 수록 관계성이 멀어질 수 있음
+RNN의 한계점이 있으니 LSTM을 꼭 사용
+기억을 더 잘하려고 씀
+- LSTM - Long Short Term Memory
+가장 먼저 Forget할 것을 올림
+데이터와 tan을 pointwise operation을 해 중요하다 싶은 것은 위로 올림
+한번더 그냥 보낼지 옆 레이어로 보낼지 결정하게됨
+
+- 딥러닝은 feature engineering이 자동화되는것
+
+
+- tensorflow는 세션 기반, 그림을 그리고 아키텍쳐 속에서 한꺼번에 처리
+- keras는 tensorflow를 백엔드로 두고 인터프리터처럼 중간 중간 결과를 보여줌
+
+- 선형 뉴런 
+x값을 통해   
+선을 찾아내는 과정  
+
+- 비선형 뉴런
+
+- autoencoder
+내부가 어떻게 되었든 내가 입력한 값을 그대로 나오게 해라
+- variational autoencoder
