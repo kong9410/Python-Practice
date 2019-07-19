@@ -89,3 +89,12 @@ embedded methods : 특정한것
 deep learning
 
 
+여태까지한거 `session.run()`을 해서 기록을 볼 수 있음
+`tf.global_variables_initializer`을 호출하여 명시적으로 초기화해야함
+
+```python
+from __future__ import print_function
+import tensorflow as tf
+
+g = tf.Graph()
+```
