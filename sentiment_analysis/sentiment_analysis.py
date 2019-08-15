@@ -12,7 +12,6 @@ import nltk
 import pickle
 import os
 
-
 with open('./text.txt', 'r') as tx:
     corpus = [tx.read()]
     text = tx.read()
@@ -45,7 +44,8 @@ for word in frequently:
     positive = dictation.data_list(wordname)
     if(positive[1] != 'None'):
         sentiment_word_list.append([wordname, int(positive[1])])
-
+for seq in sentiment_word_list:
+    print(okt.pos(seq[0]))
 print(sentiment_word_list)
 
 
