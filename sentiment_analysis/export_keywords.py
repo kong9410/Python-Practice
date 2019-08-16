@@ -1,8 +1,27 @@
 import json
 import re
+import os
 from konlpy.tag import Okt
 from collections import Counter
 
+workDir = os.path.abspath('./news/')
+filename_list = []
+contents = []
+for dirpath, dirnames, filenames in os.walk(workDir):
+	#for dirname in dirnames:
+	#	print('\t', dirname)
+	for filename in filenames:
+		filename_list.append('./news/'+filename)
+for filename in filename_list:
+	with open(filename, 'r', encoding='utf-8') as json_file:
+		text = json.load(json_file)
+		content = text["detail"]["CONTENT"]
+		content = re.sub('<.+?>', '', content, 0).strip()
+		contents.append(content)
+
+print(contents)
+
+'''
 with open('./text.json', 'r', encoding="utf-8") as json_file:
 	text = json.load(json_file)
 
@@ -15,7 +34,7 @@ content = re.sub('<.+?>', '', content, 0).strip()
 okt = Okt()
 nouns = okt.pos(content)
 print(nouns)
-'''
+
 count = Counter(nouns)
 
 tag_count = []
