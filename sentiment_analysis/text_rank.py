@@ -1,185 +1,107 @@
-import networkx
-import re
- 
-class RawSentence:
-    def __init__(self, textIter):
-        if type(textIter) == str: self.textIter = textIter.split('\n')
-        else: self.textIter = textIter
-        self.rgxSplitter = re.compile('([.!?:](?:["\']|(?![0-9])))')
- 
-    def __iter__(self):
-        for line in self.textIter:
-            ch = self.rgxSplitter.split(line)
-            for s in map(lambda a, b: a + b, ch[::2], ch[1::2]):
-                if not s: continue
-                yield s
- 
-class RawSentenceReader:
-    def __init__(self, filepath):
-        self.filepath = filepath
-        self.rgxSplitter = re.compile('([.!?:](?:["\']|(?![0-9])))')
- 
-    def __iter__(self):
-        for line in open(self.filepath, encoding='utf-8'):
-            ch = self.rgxSplitter.split(line)
-            for s in map(lambda a, b: a + b, ch[::2], ch[1::2]):
-                if not s: continue
-                yield s
- 
-class RawTagger:
-    def __init__(self, textIter, tagger = None):
-        if tagger:
-            self.tagger = tagger
-        else :
-            from konlpy.tag import Komoran
-            self.tagger = Komoran()
-        if type(textIter) == str: self.textIter = textIter.split('\n')
-        else: self.textIter = textIter
-        self.rgxSplitter = re.compile('([.!?:](?:["\']|(?![0-9])))')
- 
-    def __iter__(self):
-        for line in self.textIter:
-            ch = self.rgxSplitter.split(line)
-            for s in map(lambda a,b:a+b, ch[::2], ch[1::2]):
-                if not s: continue
-                yield self.tagger.pos(s)
- 
-class RawTaggerReader:
-    def __init__(self, filepath, tagger = None):
-        if tagger:
-            self.tagger = tagger
-        else :
-            from konlpy.tag import Komoran
-            self.tagger = Komoran()
-        self.filepath = filepath
-        self.rgxSplitter = re.compile('([.!?:](?:["\']|(?![0-9])))')
- 
-    def __iter__(self):
-        for line in open(self.filepath, encoding='utf-8'):
-            ch = self.rgxSplitter.split(line)
-            for s in map(lambda a,b:a+b, ch[::2], ch[1::2]):
-                if not s: continue
-                yield self.tagger.pos(s)
- 
-class TextRank:
-    def __init__(self, **kargs):
-        self.graph = None
-        self.window = kargs.get('window', 5)
-        self.coef = kargs.get('coef', 1.0)
-        self.threshold = kargs.get('threshold', 0.005)
-        self.dictCount = {}
-        self.dictBiCount = {}
-        self.dictNear = {}
-        self.nTotal = 0
- 
- 
-    def load(self, sentenceIter, wordFilter = None):
-        def insertPair(a, b):
-            if a > b: a, b = b, a
-            elif a == b: return
-            self.dictBiCount[a, b] = self.dictBiCount.get((a, b), 0) + 1
- 
-        def insertNearPair(a, b):
-            self.dictNear[a, b] = self.dictNear.get((a, b), 0) + 1
- 
-        for sent in sentenceIter:
-            for i, word in enumerate(sent):
-                if wordFilter and not wordFilter(word): continue
-                self.dictCount[word] = self.dictCount.get(word, 0) + 1
-                self.nTotal += 1
-                if i - 1 >= 0 and (not wordFilter or wordFilter(sent[i-1])): insertNearPair(sent[i-1], word)
-                if i + 1 < len(sent) and (not wordFilter or wordFilter(sent[i+1])): insertNearPair(word, sent[i+1])
-                for j in range(i+1, min(i+self.window+1, len(sent))):
-                    if wordFilter and not wordFilter(sent[j]): continue
-                    if sent[j] != word: insertPair(word, sent[j])
- 
-    def loadSents(self, sentenceIter, tokenizer = None):
-        import math
-        def similarity(a, b):
-            n = len(a.intersection(b))
-            return n / float(len(a) + len(b) - n) / (math.log(len(a)+1) * math.log(len(b)+1))
- 
-        if not tokenizer: rgxSplitter = re.compile('[\\s.,:;-?!()"\']+')
-        sentSet = []
-        for sent in filter(None, sentenceIter):
-            if type(sent) == str:
-                if tokenizer: s = set(filter(None, tokenizer(sent)))
-                else: s = set(filter(None, rgxSplitter.split(sent)))
-            else: s = set(sent)
-            if len(s) < 2: continue
-            self.dictCount[len(self.dictCount)] = sent
-            sentSet.append(s)
- 
-        for i in range(len(self.dictCount)):
-            for j in range(i+1, len(self.dictCount)):
-                s = similarity(sentSet[i], sentSet[j])
-                if s < self.threshold: continue
-                self.dictBiCount[i, j] = s
- 
-    def getPMI(self, a, b):
-        import math
-        co = self.dictNear.get((a, b), 0)
-        if not co: return None
-        return math.log(float(co) * self.nTotal / self.dictCount[a] / self.dictCount[b])
- 
-    def getI(self, a):
-        import math
-        if a not in self.dictCount: return None
-        return math.log(self.nTotal / self.dictCount[a])
- 
-    def build(self):
-        self.graph = networkx.Graph()
-        self.graph.add_nodes_from(self.dictCount.keys())
-        for (a, b), n in self.dictBiCount.items():
-            self.graph.add_edge(a, b, weight=n*self.coef + (1-self.coef))
- 
-    def rank(self):
-        return networkx.pagerank(self.graph, weight='weight')
- 
-    def extract(self, ratio = 0.1):
-        ranks = self.rank()
-        cand = sorted(ranks, key=ranks.get, reverse=True)[:int(len(ranks) * ratio)]
-        pairness = {}
-        startOf = {}
-        tuples = {}
-        for k in cand:
-            tuples[(k,)] = self.getI(k) * ranks[k]
-            for l in cand:
-                if k == l: continue
-                pmi = self.getPMI(k, l)
-                if pmi: pairness[k, l] = pmi
- 
-        for (k, l) in sorted(pairness, key=pairness.get, reverse=True):
-            print(k[0], l[0], pairness[k, l])
-            if k not in startOf: startOf[k] = (k, l)
- 
-        for (k, l), v in pairness.items():
-            pmis = v
-            rs = ranks[k] * ranks[l]
-            path = (k, l)
-            tuples[path] = pmis / (len(path) - 1) * rs ** (1 / len(path)) * len(path)
-            last = l
-            while last in startOf and len(path) < 7:
-                if last in path: break
-                pmis += pairness[startOf[last]]
-                last = startOf[last][1]
-                rs *= ranks[last]
-                path += (last,)
-                tuples[path] = pmis / (len(path) - 1) * rs ** (1 / len(path)) * len(path)
- 
-        used = set()
-        both = {}
-        for k in sorted(tuples, key=tuples.get, reverse=True):
-            if used.intersection(set(k)): continue
-            both[k] = tuples[k]
-            for w in k: used.add(w)
- 
-        #for k in cand:
-        #    if k not in used or True: both[k] = ranks[k] * self.getI(k)
- 
-        return both
- 
-    def summarize(self, ratio = 0.333):
-        r = self.rank()
-        ks = sorted(r, key=r.get, reverse=True)[:int(len(r)*ratio)]
-        return ' '.join(map(lambda k:self.dictCount[k], sorted(ks)))
+
+from konlpy.tag import Kkma
+from konlpy.tag import Twitter
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.preprocessing import normalize
+import numpy as np
+
+class SentenceTokenizer(object):
+    def __init__(self):
+        self.kkma = Kkma()
+        self.twitter = Twitter()
+        self.stopwords = ['중인' ,'만큼', '마찬가지', '꼬집었', "연합뉴스", "데일리", "동아일보", "중앙일보", "조선일보", "기자"
+            ,"아", "휴", "아이구", "아이쿠", "아이고", "어", "나", "우리", "저희", "따라", "의해", "을", "를", "에", "의", "가",]
+    def url2sentences(self, url):
+        article = Article(url, language='ko')
+        article.download()
+        article.parse()
+        sentences = self.kkma.sentences(article.text)
+        for idx in range(0, len(sentences)):
+            if len(sentences[idx]) <= 10:
+                sentences[idx-1] += (' ' + sentences[idx])
+                sentences[idx] = ''
+        return sentences
+    def text2sentences(self, text):
+        sentences = self.kkma.sentences(text)
+        for idx in range(0, len(sentences)):
+            if len(sentences[idx]) <= 10:
+                sentences[idx-1] += (' ' + sentences[idx])
+                sentences[idx] = ''
+        return sentences
+    def get_nouns(self, sentences):
+        nouns = []
+        for sentence in sentences:
+            if sentence is not '':
+                nouns.append(' '.join([noun for noun in self.twitter.nouns(str(sentence))
+                if noun not in self.stopwords and len(noun) > 1]))
+        return nouns
+
+
+class GraphMatrix(object):
+    def __init__(self):
+        self.tfidf = TfidfVectorizer()
+        self.cnt_vec = CountVectorizer()
+        self.graph_sentence = []
+    def build_sent_graph(self, sentence):
+        tfidf_mat = self.tfidf.fit_transform(sentence).toarray()
+        self.graph_sentence = np.dot(tfidf_mat, tfidf_mat.T)
+        return self.graph_sentence
+    def build_words_graph(self, sentence):
+        cnt_vec_mat = normalize(self.cnt_vec.fit_transform(sentence).toarray().astype(float), axis=0)
+        vocab = self.cnt_vec.vocabulary_
+        return np.dot(cnt_vec_mat.T, cnt_vec_mat), {vocab[word] : word for word in vocab}
+
+class Rank(object):
+    def get_ranks(self, graph, d=0.85): # d = damping factor
+        A = graph
+        matrix_size = A.shape[0]
+        for id in range(matrix_size):
+            A[id, id] = 0 # diagonal 부분을 0으로
+            link_sum = np.sum(A[:,id]) # A[:, id] = A[:][id]
+            if link_sum != 0:
+                A[:, id] /= link_sum
+            A[:, id] *= -d
+            A[id, id] = 1
+        B = (1-d) * np.ones((matrix_size, 1))
+        ranks = np.linalg.solve(A, B) # 연립방정식 Ax = b
+        return {idx: r[0] for idx, r in enumerate(ranks)}
+
+class TextRank(object):
+    def __init__(self, text):
+        self.sent_tokenize = SentenceTokenizer()
+        if text[:5] in ('http:', 'https'):
+            self.sentences = self.sent_tokenize.url2sentences(text)
+        else:
+            self.sentences = self.sent_tokenize.text2sentences(text)
+        self.nouns = self.sent_tokenize.get_nouns(self.sentences)
+        self.graph_matrix = GraphMatrix()
+        self.sent_graph = self.graph_matrix.build_sent_graph(self.nouns)
+        self.words_graph, self.idx2word = self.graph_matrix.build_words_graph(self.nouns)
+        self.rank = Rank()
+        self.sent_rank_idx = self.rank.get_ranks(self.sent_graph)
+        self.sorted_sent_rank_idx = sorted(self.sent_rank_idx, key=lambda k: self.sent_rank_idx[k], reverse=True)
+        self.word_rank_idx = self.rank.get_ranks(self.words_graph)
+        self.sorted_word_rank_idx = sorted(self.word_rank_idx, key=lambda k: self.word_rank_idx[k], reverse=True)
+    def summarize(self, sent_num=3):
+        summary = []
+        index=[]
+        for idx in self.sorted_sent_rank_idx[:sent_num]:
+            index.append(idx)
+        index.sort()
+        for idx in index:
+            summary.append(self.sentences[idx])
+        return summary
+    def keywords(self, word_num=10):
+        rank = Rank()
+        rank_idx = rank.get_ranks(self.words_graph)
+        sorted_rank_idx = sorted(rank_idx, key=lambda k: rank_idx[k], reverse=True)
+        keywords = []
+        index=[]
+        for idx in sorted_rank_idx[:word_num]:
+            index.append(idx)
+        #index.sort()
+        for idx in index:
+            keywords.append(self.idx2word[idx])
+        return keywords
+
