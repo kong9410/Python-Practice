@@ -12,7 +12,6 @@ import nltk
 import pickle
 import os
 
-
 with open('./text.txt', 'r') as tx:
     corpus = [tx.read()]
     text = tx.read()
@@ -21,7 +20,6 @@ with open('./text.txt', 'r') as tx:
 kor = Kkma()
 okt = Okt()
 
-tokens = okt.morphs(text)
 
 # tf idf
 vectorizer = TfidfVectorizer()
@@ -45,6 +43,11 @@ for word in frequently:
     positive = dictation.data_list(wordname)
     if(positive[1] != 'None'):
         sentiment_word_list.append([wordname, int(positive[1])])
+for seq in frequently:
+    isit = okt.nouns(seq[0])
+    for s_seq in isit:
+        
+        print(isit)
 
 print(sentiment_word_list)
 
@@ -63,4 +66,5 @@ if pos_count > neg_count:
     print("긍정적 기사")
 elif neg_count > pos_count:
     print("부정적 기사")
-    
+else:
+    print("중립") 
