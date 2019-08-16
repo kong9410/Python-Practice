@@ -1,6 +1,7 @@
 import json
 import re
 import os
+import text_rank as tr
 from konlpy.tag import Okt
 from collections import Counter
 
@@ -18,8 +19,14 @@ for filename in filename_list:
 		content = text["detail"]["CONTENT"]
 		content = re.sub('<.+?>', '', content, 0).strip()
 		contents.append(content)
+print(len(contents))
+for content in contents:
+	textrank = tr.TextRank(content)
+	for row in textrank.summarize(1):
+		print(row)
+		print()
+	print('keyword :', textrank.keywords())
 
-print(contents)
 
 '''
 with open('./text.json', 'r', encoding="utf-8") as json_file:
