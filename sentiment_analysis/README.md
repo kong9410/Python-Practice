@@ -1,28 +1,28 @@
 ## sentiment analysis.py
 
-°¨¼ººÐ¼®±â
+ê°ì„±ë¶„ì„ê¸°
 
 ## knusl
 
-°¨¼ººÐ¼® »çÀü¿¡¼­ ´Ü¾î ºÐ·ù
+ê°ì„±ë¶„ì„ ì‚¬ì „ì—ì„œ ë‹¨ì–´ ë¶„ë¥˜
 
 ## text_rank.py
 
-ÅØ½ºÆ® ¿ä¾à ¹× Å°¿öµå ÃßÃâ
+í…ìŠ¤íŠ¸ ìš”ì•½ ë° í‚¤ì›Œë“œ ì¶”ì¶œ
 
-ÅØ½ºÆ® ¿ä¾àÀº Á¦´ë·Î µÇ´Â°Ô ¾Æ´ÑµíÇÏ´Ï±î ¸¸µé¾î¾ßÇÒµí
+í…ìŠ¤íŠ¸ ìš”ì•½ì€ ì œëŒ€ë¡œ ë˜ëŠ”ê²Œ ì•„ë‹Œë“¯í•˜ë‹ˆê¹Œ ë§Œë“¤ì–´ì•¼í• ë“¯
 
-ÄÚµå Âü°í »çÀÌÆ®  
-![textrank](https://excelsior-cjh.tistory.com/93)
+ì½”ë“œ ì°¸ê³  ì‚¬ì´íŠ¸  
+<https://excelsior-cjh.tistory.com/93>
 
 ## export_keywords.py
 
-ÅØ½ºÆ® ¿ä¾à ¹× Å°¿öµå °¡Á®¿À±â
+í…ìŠ¤íŠ¸ ìš”ì•½ ë° í‚¤ì›Œë“œ ê°€ì ¸ì˜¤ê¸°
 
-### news µð·ºÅä¸®
+### news ë””ë ‰í† ë¦¬
 
-´º½º json ÆÄÀÏ ¸ðÀ½Áý
+ë‰´ìŠ¤ json íŒŒì¼ ëª¨ìŒì§‘
 
-### data µð·ºÅä¸®
+### data ë””ë ‰í† ë¦¬
 
-SentiWord_info.json ´Ü¾î »çÀü
+SentiWord_info.json ë‹¨ì–´ ì‚¬ì „
